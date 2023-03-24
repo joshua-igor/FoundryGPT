@@ -1,0 +1,22 @@
+{
+  "id": "foundry-gpt",
+  "title": "FoundryGPT (WIP)",
+  "description": "An AI Assistant for FoundryVTT using the ChatGPT technology",
+  "version": "0.0.1",
+  "compatibility": {
+    "minimum": "9",
+    "verified": "10"
+  },
+  "authors": [
+    {
+      "name": "Josh Nautes"
+    }
+  ],
+  "esmodules": [
+    "./scripts/main.js",
+    "./scripts/openai.js"
+  ],
+  "url": "https://github.com/joshua-igor/FoundryGPT",
+  "manifest": "https://github.com/joshua-igor/FoundryGPT/releases/download/wip/module.json",
+  "download": "https://github.com/joshua-igor/FoundryGPT/releases/download/wip/module.zip"
+}
