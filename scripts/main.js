@@ -1,4 +1,5 @@
 import {chatGPTRequest} from './openai.js'
+import {pf2eContext} from '../systems/pf2e.js'
 Hooks.once('init', function() {
   console.log('FoundryGPT | Initializing');
 
@@ -108,12 +109,9 @@ Hooks.once('ready', async function() {
       await game.settings.set('foundry-gpt', 'apiKey', input);
     }
   }
-
 });
 
 Hooks.on('chatMessage', function(chatLog, message, chatSpeakerData) {
-  console.log("chatSpeakerData: "+JSON.stringify(chatSpeakerData))
-
   // Check if the message is a chat command and the players are allowed to use the AI assistant
   if ((message.startsWith('/ai') || message.startsWith('/gpt')) && ((game.settings.get('foundry-gpt', 'playersCanUse') || game.user.isGM))) {
     // Get the API Key from the module settings and get the author of the message
@@ -146,8 +144,25 @@ Hooks.on('chatMessage', function(chatLog, message, chatSpeakerData) {
       author : author
     }
 
-    // Call the chatGPTRequest function with the message and context variables
-    chatGPTRequest(apiKey, gmID, message, context);
+    // Get system-related information about the author's character
+    let systemPrompt = pf2eContext(author)
+    let finalPrompt = [
+      {'role': 'user', 'content': `My name is ${context.author.name} I'm playing ${context.systemName} as a ${context.author.role} using FoundryVTT. ${systemPrompt}. Who are you?`},
+      {'role': 'assistant', 'content': `<p>Hello, ${context.author.name}. My name is FoundryGPT.</p><p>I am an RPG bot that help players and GMs. I can assist you with: <ul><li>Rules<li>Character Creation<li>Inspiration<li>And other aspects of your game.</ul>/n`},
+      {'role': 'user','content': `Roll me two 20-sided dice and keep the lowest`},
+      {'role': 'assistant', 'content': `Sure! Here's the result: [[{2d20kl}+5]]/n`},
+      {'role': 'user','content': `${message}`}
+    ];
+
+    // Call the chatGPTRequest function with the finalPrompt
+    chatGPTRequest(apiKey, gmID, finalPrompt);
+
+    // Replace either "/ai" or "/gpt" with "FoundryGPT:"
+    message = message.replace(/\/ai|\/gpt/, '<div class="tags"><span class="tag tag_transparent"><b>To FoundryGPT:</b></span></div>')
+    //Create the chatMessage with the user's prompt
+    ChatMessage.create({ "content": message, "speaker": {"actor": context.author.user.id}});
+
+    // Cancel Foundry's core handling of the message.
     return false;
   }
 })

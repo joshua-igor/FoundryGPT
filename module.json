@@ -14,7 +14,8 @@
   ],
   "esmodules": [
     "./scripts/main.js",
-    "./scripts/openai.js"
+    "./scripts/openai.js",
+    "./systems/pf2e.js"
   ],
   "url": "https://github.com/joshua-igor/FoundryGPT",
   "manifest": "https://github.com/joshua-igor/FoundryGPT/releases/download/wip/module.json",
